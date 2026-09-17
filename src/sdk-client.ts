@@ -57,14 +57,13 @@ export class SdkObsClient implements ObsClientLike {
   }
 
   async copyObject(srcKey: string, destKey: string): Promise<void> {
-    // SDK declares CopySource skipEncoding:true — the caller must encode it.
-    // Encode per path segment, preserving '/' separators, so non-Latin-1 keys
-    // (e.g. Chinese template names) don't crash the HTTP header.
-    const copySource = [this.bucket, ...srcKey.split('/')].map(encodeURIComponent).join('/');
+    // The SDK encodes CopySource itself (encodeURIWithSafe in obs.js copyObject),
+    // including the '/' separators — so we must pass it RAW/decoded. Pre-encoding
+    // here would double-encode ('%' -> '%25') and the server would 404.
     const result = await this.client.copyObject({
       Bucket: this.bucket,
       Key: destKey,
-      CopySource: copySource,
+      CopySource: `${this.bucket}/${srcKey}`,
     });
     checkCommon(result.CommonMsg, 'copyObject');
   }
