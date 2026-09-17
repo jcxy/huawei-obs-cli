@@ -1,2 +1,9 @@
 # Qoder IDE local state
 .qoder/
+
+# Node
+node_modules/
+dist/
+
+# Test / coverage
+coverage/

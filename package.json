@@ -1,0 +1,47 @@
+{
+  "name": "@cvtoolman/huawei-obs-cli",
+  "version": "0.1.0",
+  "description": "Operate Huawei Cloud OBS (Object Storage Service) from the command line — built for AI coding assistants.",
+  "type": "module",
+  "bin": {
+    "obs-cli": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "huawei",
+    "obs",
+    "object-storage",
+    "cli",
+    "ai",
+    "skill",
+    "agent"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "esdk-obs-nodejs": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
