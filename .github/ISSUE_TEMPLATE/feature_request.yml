@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a command, flag, or behavior
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This CLI stays deliberately small: it is a thin transport for OBS object
+        operations, not a replacement for the Huawei Cloud console or `obsutil`.
+        Requests that keep the command surface small are the easiest to accept.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What can't you do today
+      description: Describe the workflow that is currently awkward or impossible.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed command or flag
+      description: Sketch the interface if you have one in mind.
+      placeholder: |
+        obs-cli <command> [args] --flag
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Existing commands, `obsutil`, or scripting around the current CLI.

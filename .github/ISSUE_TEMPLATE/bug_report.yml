@@ -1,0 +1,43 @@
+name: Bug report
+description: Something behaves incorrectly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Never paste AK/SK or bucket names you cannot share publicly.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: The exact command, the output you got, and what you expected instead.
+      placeholder: |
+        $ obs-cli ls dev/
+        ...
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: obs-cli version
+      description: Output of `obs-cli --version`.
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      description: Output of `node --version`.
+    validations:
+      required: true

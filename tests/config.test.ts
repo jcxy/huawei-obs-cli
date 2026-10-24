@@ -29,13 +29,29 @@ describe('config', () => {
     });
 
     it('reads config from ~/.obs-cli/config.json', async () => {
-      writeFileSync(join(home, '.obs-cli', 'config.json'), JSON.stringify({ ak: 'AK', sk: 'SK', endpoint: 'https://obs.cn-north-4.myhuaweicloud.com', bucket: 'mybucket' }));
+      writeFileSync(
+        join(home, '.obs-cli', 'config.json'),
+        JSON.stringify({
+          ak: 'AK',
+          sk: 'SK',
+          endpoint: 'https://obs.cn-north-4.myhuaweicloud.com',
+          bucket: 'mybucket',
+        }),
+      );
       const { loadConfig } = await import('../src/config.js');
-      expect(loadConfig()).toEqual({ ak: 'AK', sk: 'SK', endpoint: 'https://obs.cn-north-4.myhuaweicloud.com', bucket: 'mybucket' });
+      expect(loadConfig()).toEqual({
+        ak: 'AK',
+        sk: 'SK',
+        endpoint: 'https://obs.cn-north-4.myhuaweicloud.com',
+        bucket: 'mybucket',
+      });
     });
 
     it('env vars override file values', async () => {
-      writeFileSync(join(home, '.obs-cli', 'config.json'), JSON.stringify({ ak: 'file-ak', sk: 'file-sk', bucket: 'file-bucket' }));
+      writeFileSync(
+        join(home, '.obs-cli', 'config.json'),
+        JSON.stringify({ ak: 'file-ak', sk: 'file-sk', bucket: 'file-bucket' }),
+      );
       process.env.OBS_AK = 'env-ak';
       process.env.OBS_BUCKET = 'env-bucket';
       const { loadConfig } = await import('../src/config.js');

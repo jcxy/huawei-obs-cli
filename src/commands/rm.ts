@@ -9,7 +9,10 @@ export async function runRm(client: ObsClientLike, options: RmOptions): Promise<
     await client.deleteObject(options.key);
   } catch (err) {
     if (err instanceof ObsError) {
-      return { ok: false, output: `Delete failed for ${options.key}: ${err.status} ${err.code} — ${err.message}` };
+      return {
+        ok: false,
+        output: `Delete failed for ${options.key}: ${err.status} ${err.code} — ${err.message}`,
+      };
     }
     return { ok: false, output: `Delete failed for ${options.key}: ${errorMessage(err)}` };
   }

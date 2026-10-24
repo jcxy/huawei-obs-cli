@@ -4,7 +4,6 @@ import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { loadConfig, validateCredentials } from './config.js';
 import { SdkObsClient } from './sdk-client.js';
-import type { ObsClientLike } from './obs.js';
 import { runLs } from './commands/ls.js';
 import { runDownload } from './commands/download.js';
 import { runUpload } from './commands/upload.js';
@@ -136,10 +135,7 @@ program
   .action(async (prefix: string | undefined, options: GlobalOptions, command) => {
     const global = command.parent.opts() as GlobalOptions;
     const client = createClient(global);
-    await finish(
-      await runLs(client, { prefix: prefix ?? '', format: parsedFormat(global) }),
-      client,
-    );
+    await finish(await runLs(client, { prefix: prefix ?? '', format: parsedFormat(global) }), client);
   });
 
 program

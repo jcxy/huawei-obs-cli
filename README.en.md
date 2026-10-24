@@ -6,9 +6,9 @@
 
 One tool, two parts:
 
-| Part | Purpose |
-| --- | --- |
-| CLI (`obs-cli`) | A lightweight command-line client for the Huawei Cloud OBS API |
+| Part               | Purpose                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| CLI (`obs-cli`)    | A lightweight command-line client for the Huawei Cloud OBS API                         |
 | SKILL (`SKILL.md`) | A "manual" for AI assistants, teaching them to turn natural language into CLI commands |
 
 Once the AI has read the skill, you can simply say "publish the user-import template to production" — the AI lists the files, confirms with you, and runs `obs-cli copy dev/... prod/...`. No keys to remember, no console to open.
@@ -92,12 +92,12 @@ Global options (placed before the subcommand):
 
 Stored in `~/.obs-cli/config.json` (Windows: `%USERPROFILE%\.obs-cli\config.json`).
 
-| Key | Required | Description |
-| --- | --- | --- |
-| ak | yes | Huawei Cloud Access Key |
-| sk | yes | Huawei Cloud Secret Key |
-| endpoint | yes | OBS endpoint incl. scheme, e.g. `https://obs.cn-north-4.myhuaweicloud.com` |
-| bucket | no | Default bucket (can be overridden per command with `--bucket`) |
+| Key      | Required | Description                                                                |
+| -------- | -------- | -------------------------------------------------------------------------- |
+| ak       | yes      | Huawei Cloud Access Key                                                    |
+| sk       | yes      | Huawei Cloud Secret Key                                                    |
+| endpoint | yes      | OBS endpoint incl. scheme, e.g. `https://obs.cn-north-4.myhuaweicloud.com` |
+| bucket   | no       | Default bucket (can be overridden per command with `--bucket`)             |
 
 Environment variables take precedence over the file: `OBS_AK` / `OBS_SK` / `OBS_ENDPOINT` / `OBS_BUCKET`.
 

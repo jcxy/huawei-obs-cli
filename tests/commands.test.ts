@@ -37,7 +37,11 @@ function fakeClient(objects: ObsObject[] = []): ObsClientLike & { calls: Record<
   };
 }
 
-const OBJ = (key: string, size = 1024, lastModified = '2026-09-01T10:00:00.000Z'): ObsObject => ({ key, size, lastModified });
+const OBJ = (key: string, size = 1024, lastModified = '2026-09-01T10:00:00.000Z'): ObsObject => ({
+  key,
+  size,
+  lastModified,
+});
 
 describe('ls', () => {
   it('outputs key<TAB>size<TAB>modified lines, sorted by key', async () => {
@@ -63,7 +67,9 @@ describe('ls', () => {
     const client = fakeClient([OBJ('a.xlsx')]);
     const result = await runLs(client, { prefix: '', format: 'json' });
     expect(result.ok).toBe(true);
-    expect(JSON.parse(result.output)).toEqual([{ key: 'a.xlsx', size: 1024, lastModified: '2026-09-01T10:00:00.000Z' }]);
+    expect(JSON.parse(result.output)).toEqual([
+      { key: 'a.xlsx', size: 1024, lastModified: '2026-09-01T10:00:00.000Z' },
+    ]);
   });
 
   it('empty listing outputs nothing in text mode, empty array in json mode', async () => {

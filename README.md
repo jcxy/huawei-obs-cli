@@ -6,9 +6,9 @@
 
 一个工具，两部分：
 
-| 部分 | 作用 |
-| --- | --- |
-| CLI (`obs-cli`) | 轻量命令行工具，对接华为云 OBS API |
+| 部分               | 作用                                                    |
+| ------------------ | ------------------------------------------------------- |
+| CLI (`obs-cli`)    | 轻量命令行工具，对接华为云 OBS API                      |
 | SKILL (`SKILL.md`) | 一份给 AI 看的"说明书"，教它如何把自然语言转成 CLI 命令 |
 
 AI 读完 skill 后，你只需说一句"把用户导入模版发布到生产"，AI 就会自动列出文件、向你确认、执行 `obs-cli copy dev/... prod/...`。不用记 key，不用开控制台。
@@ -92,12 +92,12 @@ obs-cli completion <bash|zsh|powershell>  Shell 补全
 
 配置存储在 `~/.obs-cli/config.json`（Windows: `%USERPROFILE%\.obs-cli\config.json`）。
 
-| 键 | 必填 | 说明 |
-| --- | --- | --- |
-| ak | 是 | 华为云 Access Key |
-| sk | 是 | 华为云 Secret Key |
-| endpoint | 是 | OBS 终端节点，含协议，如 `https://obs.cn-north-4.myhuaweicloud.com` |
-| bucket | 否 | 默认桶（可用 `--bucket` 按命令覆盖） |
+| 键       | 必填 | 说明                                                                |
+| -------- | ---- | ------------------------------------------------------------------- |
+| ak       | 是   | 华为云 Access Key                                                   |
+| sk       | 是   | 华为云 Secret Key                                                   |
+| endpoint | 是   | OBS 终端节点，含协议，如 `https://obs.cn-north-4.myhuaweicloud.com` |
+| bucket   | 否   | 默认桶（可用 `--bucket` 按命令覆盖）                                |
 
 环境变量优先级高于配置文件：`OBS_AK` / `OBS_SK` / `OBS_ENDPOINT` / `OBS_BUCKET`。
 

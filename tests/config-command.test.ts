@@ -23,7 +23,10 @@ describe('config command', () => {
   });
 
   it('list prints all keys, masking sk', async () => {
-    writeFileSync(join(home, '.obs-cli', 'config.json'), JSON.stringify({ ak: 'AK', sk: 'SECRETSECRET', endpoint: 'https://obs.example.com', bucket: 'b' }));
+    writeFileSync(
+      join(home, '.obs-cli', 'config.json'),
+      JSON.stringify({ ak: 'AK', sk: 'SECRETSECRET', endpoint: 'https://obs.example.com', bucket: 'b' }),
+    );
     const { runConfigCommand } = await import('../src/commands/config.js');
     const result = await runConfigCommand({ action: 'list', format: 'text' });
     expect(result.ok).toBe(true);
@@ -43,7 +46,12 @@ describe('config command', () => {
 
   it('set writes a key', async () => {
     const { runConfigCommand } = await import('../src/commands/config.js');
-    const result = await runConfigCommand({ action: 'set', key: 'bucket', value: 'my-bucket', format: 'text' });
+    const result = await runConfigCommand({
+      action: 'set',
+      key: 'bucket',
+      value: 'my-bucket',
+      format: 'text',
+    });
     expect(result.ok).toBe(true);
     const saved = JSON.parse(readFileSync(join(home, '.obs-cli', 'config.json'), 'utf-8'));
     expect(saved.bucket).toBe('my-bucket');
@@ -112,11 +120,19 @@ describe('init wizard', () => {
     const result = await runInit(ask);
     expect(result.ok).toBe(true);
     const saved = JSON.parse(readFileSync(join(home, '.obs-cli', 'config.json'), 'utf-8'));
-    expect(saved).toEqual({ ak: 'AK', sk: 'SK', endpoint: 'https://obs.cn-north-4.myhuaweicloud.com', bucket: 'my-bucket' });
+    expect(saved).toEqual({
+      ak: 'AK',
+      sk: 'SK',
+      endpoint: 'https://obs.cn-north-4.myhuaweicloud.com',
+      bucket: 'my-bucket',
+    });
   });
 
   it('keeps existing value when answer is empty and default exists', async () => {
-    writeFileSync(join(home, '.obs-cli', 'config.json'), JSON.stringify({ ak: 'old-ak', sk: 'old-sk', endpoint: 'old-e', bucket: 'old-b' }));
+    writeFileSync(
+      join(home, '.obs-cli', 'config.json'),
+      JSON.stringify({ ak: 'old-ak', sk: 'old-sk', endpoint: 'old-e', bucket: 'old-b' }),
+    );
     const { runInit } = await import('../src/commands/init.js');
     const ask = async () => '';
     const result = await runInit(ask);

@@ -39,9 +39,8 @@ export class SdkObsClient implements ObsClientLike {
         });
       }
       // SDK parses XML with parseTagValue:false, so IsTruncated is the string 'true'/'false'.
-      marker = result.InterfaceResult?.IsTruncated === 'true'
-        ? result.InterfaceResult?.NextMarker
-        : undefined;
+      marker =
+        result.InterfaceResult?.IsTruncated === 'true' ? result.InterfaceResult?.NextMarker : undefined;
     } while (marker);
     return objects;
   }
@@ -78,10 +77,7 @@ export class SdkObsClient implements ObsClientLike {
   }
 }
 
-function checkCommon(
-  common: { Status: number; Code?: string; Message?: string },
-  operation: string,
-): void {
+function checkCommon(common: { Status: number; Code?: string; Message?: string }, operation: string): void {
   if (common.Status >= 300) {
     throw new ObsError(common.Status, common.Code ?? 'Unknown', common.Message ?? `OBS ${operation} failed`);
   }

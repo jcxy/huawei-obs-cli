@@ -11,7 +11,10 @@ export async function runLs(client: ObsClientLike, options: LsOptions): Promise<
     objects = await client.listObjects(options.prefix);
   } catch (err) {
     if (err instanceof ObsError) {
-      return { ok: false, output: `List failed for prefix '${options.prefix}': ${err.status} ${err.code} — ${err.message}` };
+      return {
+        ok: false,
+        output: `List failed for prefix '${options.prefix}': ${err.status} ${err.code} — ${err.message}`,
+      };
     }
     return { ok: false, output: `List failed for prefix '${options.prefix}': ${errorMessage(err)}` };
   }

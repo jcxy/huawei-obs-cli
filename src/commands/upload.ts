@@ -14,7 +14,10 @@ export async function runUpload(client: ObsClientLike, options: UploadOptions): 
     await client.putObject(options.key, options.file);
   } catch (err) {
     if (err instanceof ObsError) {
-      return { ok: false, output: `Upload failed for ${options.key}: ${err.status} ${err.code} — ${err.message}` };
+      return {
+        ok: false,
+        output: `Upload failed for ${options.key}: ${err.status} ${err.code} — ${err.message}`,
+      };
     }
     return { ok: false, output: `Upload failed for ${options.key}: ${errorMessage(err)}` };
   }

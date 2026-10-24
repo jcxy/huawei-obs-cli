@@ -1,0 +1,3 @@
+# Normalize line endings on commit and check out LF everywhere, so the same
+# files pass `npm run format:check` on Linux and Windows CI.
+* text=auto eol=lf

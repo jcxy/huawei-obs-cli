@@ -63,13 +63,13 @@ The user's system keeps Excel import/export templates in OBS, separated by direc
 
 ## Typical translations
 
-| User says | You run |
-|---|---|
-| "看下 dev 目录有哪些模版" | `obs-cli ls dev/` |
-| "把用户导入模版下载下来" | `obs-cli download dev/user-import.xlsx` |
-| "改好了，传回去" | `obs-cli upload user-import.xlsx dev/user-import.xlsx` |
-| "把这个模版发到生产" | confirm first, then `obs-cli copy dev/user-import.xlsx prod/user-import.xlsx` |
-| "删掉 dev 下那个废弃模版" | confirm first, then `obs-cli rm dev/old-template.xlsx` |
+| User says                 | You run                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| "看下 dev 目录有哪些模版" | `obs-cli ls dev/`                                                             |
+| "把用户导入模版下载下来"  | `obs-cli download dev/user-import.xlsx`                                       |
+| "改好了，传回去"          | `obs-cli upload user-import.xlsx dev/user-import.xlsx`                        |
+| "把这个模版发到生产"      | confirm first, then `obs-cli copy dev/user-import.xlsx prod/user-import.xlsx` |
+| "删掉 dev 下那个废弃模版" | confirm first, then `obs-cli rm dev/old-template.xlsx`                        |
 
 ## Notes
 

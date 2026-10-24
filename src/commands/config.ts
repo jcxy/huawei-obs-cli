@@ -40,7 +40,10 @@ function list(format: 'text' | 'json'): CommandResult {
 
 function set(key: string | undefined, value: string | undefined): CommandResult {
   if (!isValidKey(key)) {
-    return { ok: false, output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}` };
+    return {
+      ok: false,
+      output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}`,
+    };
   }
   if (value === undefined) {
     return { ok: false, output: 'Usage: obs-cli config set <key> <value>' };
@@ -51,18 +54,27 @@ function set(key: string | undefined, value: string | undefined): CommandResult 
 
 function get(key: string | undefined): CommandResult {
   if (!isValidKey(key)) {
-    return { ok: false, output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}` };
+    return {
+      ok: false,
+      output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}`,
+    };
   }
   const value = loadConfig()[key];
   if (value === undefined) {
-    return { ok: false, output: `${key} is not set. Run \`obs-cli init\` or use \`obs-cli config set ${key} <value>\`.` };
+    return {
+      ok: false,
+      output: `${key} is not set. Run \`obs-cli init\` or use \`obs-cli config set ${key} <value>\`.`,
+    };
   }
   return { ok: true, output: value };
 }
 
 function unset(key: string | undefined): CommandResult {
   if (!isValidKey(key)) {
-    return { ok: false, output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}` };
+    return {
+      ok: false,
+      output: `Unknown config key: ${key ?? '(none)'}. Valid keys: ${VALID_KEYS.join(', ')}`,
+    };
   }
   const config = loadConfig();
   delete config[key];
