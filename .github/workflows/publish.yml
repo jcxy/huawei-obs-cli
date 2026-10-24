@@ -16,13 +16,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      # Trusted Publishing exchanges a GitHub OIDC token for a short-lived publish
-      # credential, so no NODE_AUTH_TOKEN is needed here. Do not pass registry-url:
-      # it writes a .npmrc pointing at ${NODE_AUTH_TOKEN}, which shadows the OIDC
-      # path and makes the publish fail with 404.
-      # Configure it once at npmjs.com -> package -> Settings -> Trusted Publisher
-      # (repository jcxy/huawei-obs-cli, workflow publish.yml, no environment).
+          registry-url: https://registry.npmjs.org
+      # Caching is deliberately off in release builds.
+      # Trusted Publishing needs no NODE_AUTH_TOKEN: npm detects the OIDC
+      # environment (id-token: write above) and exchanges it for a short-lived
+      # credential. Configure it once at npmjs.com -> package -> Settings ->
+      # Trusted Publisher (repository jcxy/huawei-obs-cli, workflow publish.yml,
+      # no environment) and enable "Allow npm publish" under Allowed actions:
+      # connections created after 2026-09-03 may only stage by default, and a
+      # direct publish is then rejected by the registry with a 404.
       - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
