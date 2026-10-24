@@ -1,5 +1,5 @@
 import ObsClient from 'esdk-obs-nodejs';
-import { ObsError, type ObsClientLike, type ObsObject } from './obs.js';
+import { ObsError, type ObsClientLike, type ObsObject, type ObsObjectMeta } from './obs.js';
 
 const PAGE_SIZE = 1000;
 
@@ -43,6 +43,20 @@ export class SdkObsClient implements ObsClientLike {
         result.InterfaceResult?.IsTruncated === 'true' ? result.InterfaceResult?.NextMarker : undefined;
     } while (marker);
     return objects;
+  }
+
+  async headObject(key: string): Promise<ObsObjectMeta> {
+    const result = await this.client.headObject({ Bucket: this.bucket, Key: key });
+    checkCommon(result.CommonMsg, 'headObject');
+    // The SDK parses HeadObject response headers into top-level InterfaceResult
+    // fields (ContentLength / ETag / LastModified), not into InterfaceResult.Metadata.
+    const info = result.InterfaceResult ?? {};
+    return {
+      key,
+      size: Number(info.ContentLength ?? 0),
+      etag: info.ETag ?? '',
+      lastModified: info.LastModified ?? '',
+    };
   }
 
   async putObject(key: string, filePath: string): Promise<void> {

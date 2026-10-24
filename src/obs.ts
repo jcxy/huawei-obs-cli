@@ -1,5 +1,7 @@
 /** Minimal interface the command layer depends on — the single test seam. */
 
+export type OutputFormat = 'text' | 'json';
+
 export interface ObsObject {
   key: string;
   /** Size in bytes. */
@@ -8,8 +10,14 @@ export interface ObsObject {
   lastModified: string;
 }
 
+/** What a HEAD request can tell us about a single object. */
+export interface ObsObjectMeta extends ObsObject {
+  etag: string;
+}
+
 export interface ObsClientLike {
   listObjects(prefix: string): Promise<ObsObject[]>;
+  headObject(key: string): Promise<ObsObjectMeta>;
   putObject(key: string, filePath: string): Promise<void>;
   getObject(key: string, filePath: string): Promise<void>;
   copyObject(srcKey: string, destKey: string): Promise<void>;

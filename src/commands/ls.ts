@@ -1,8 +1,8 @@
-import { ObsError, type CommandResult, type ObsClientLike } from '../obs.js';
+import { ObsError, type CommandResult, type ObsClientLike, type OutputFormat } from '../obs.js';
 
 export interface LsOptions {
   prefix: string;
-  format: 'text' | 'json';
+  format: OutputFormat;
 }
 
 export async function runLs(client: ObsClientLike, options: LsOptions): Promise<CommandResult> {

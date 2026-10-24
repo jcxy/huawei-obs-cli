@@ -1,10 +1,22 @@
-import { ObsError, type CommandResult, type ObsClientLike } from '../obs.js';
+import { ObsError, type CommandResult, type ObsClientLike, type OutputFormat } from '../obs.js';
 
 export interface RmOptions {
   key: string;
+  format: OutputFormat;
+  /** Report the delete that would run instead of performing it. */
+  dryRun?: boolean;
 }
 
 export async function runRm(client: ObsClientLike, options: RmOptions): Promise<CommandResult> {
+  if (options.dryRun) {
+    return {
+      ok: true,
+      output:
+        options.format === 'json'
+          ? JSON.stringify({ dryRun: true, action: 'delete', key: options.key })
+          : `Would delete ${options.key}`,
+    };
+  }
   try {
     await client.deleteObject(options.key);
   } catch (err) {

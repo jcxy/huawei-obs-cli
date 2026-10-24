@@ -5,6 +5,7 @@ import { stdin, stdout } from 'node:process';
 import { loadConfig, validateCredentials } from './config.js';
 import { SdkObsClient } from './sdk-client.js';
 import { runLs } from './commands/ls.js';
+import { runStat } from './commands/stat.js';
 import { runDownload } from './commands/download.js';
 import { runUpload } from './commands/upload.js';
 import { runCopy } from './commands/copy.js';
@@ -139,6 +140,15 @@ program
   });
 
 program
+  .command('stat <key>')
+  .description('print size, etag and last-modified for one object (exit 1 when it does not exist)')
+  .action(async (key: string, _options, command) => {
+    const global = command.parent.opts() as GlobalOptions;
+    const client = createClient(global);
+    await finish(await runStat(client, { key, format: parsedFormat(global) }), client);
+  });
+
+program
   .command('download <key>')
   .description('download an object to a local file (defaults to the key basename)')
   .option('-o, --output <file>', 'local output path')
@@ -151,28 +161,40 @@ program
 program
   .command('upload <file> <key>')
   .description('upload a local file to the given object key')
-  .action(async (file: string, key: string, _options, command) => {
+  .option('--dry-run', 'print the upload that would run, without uploading')
+  .action(async (file: string, key: string, cmdOptions: { dryRun?: boolean }, command) => {
     const global = command.parent.opts() as GlobalOptions;
     const client = createClient(global);
-    await finish(await runUpload(client, { file, key }), client);
+    await finish(
+      await runUpload(client, { file, key, format: parsedFormat(global), dryRun: cmdOptions.dryRun }),
+      client,
+    );
   });
 
 program
   .command('copy <srcKey> <destKey>')
   .description('copy an object server-side (e.g. move dev template to prod path)')
-  .action(async (srcKey: string, destKey: string, _options, command) => {
+  .option('--dry-run', 'print the copy that would run, without copying')
+  .action(async (srcKey: string, destKey: string, cmdOptions: { dryRun?: boolean }, command) => {
     const global = command.parent.opts() as GlobalOptions;
     const client = createClient(global);
-    await finish(await runCopy(client, { srcKey, destKey }), client);
+    await finish(
+      await runCopy(client, { srcKey, destKey, format: parsedFormat(global), dryRun: cmdOptions.dryRun }),
+      client,
+    );
   });
 
 program
   .command('rm <key>')
   .description('delete an object (irreversible; the CLI never asks for confirmation)')
-  .action(async (key: string, _options, command) => {
+  .option('--dry-run', 'print the delete that would run, without deleting')
+  .action(async (key: string, cmdOptions: { dryRun?: boolean }, command) => {
     const global = command.parent.opts() as GlobalOptions;
     const client = createClient(global);
-    await finish(await runRm(client, { key }), client);
+    await finish(
+      await runRm(client, { key, format: parsedFormat(global), dryRun: cmdOptions.dryRun }),
+      client,
+    );
   });
 
 program

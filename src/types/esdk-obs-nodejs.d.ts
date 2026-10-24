@@ -24,6 +24,17 @@ declare module 'esdk-obs-nodejs' {
       CommonMsg: CommonMsg;
       InterfaceResult?: Record<string, unknown>;
     }
+    /** HeadObject parses response headers into top-level InterfaceResult fields. */
+    interface HeadResult {
+      CommonMsg: CommonMsg;
+      InterfaceResult?: {
+        /** Header values arrive as strings. */
+        ContentLength?: string;
+        ETag?: string;
+        LastModified?: string;
+        Metadata?: Record<string, string>;
+      };
+    }
     interface Options {
       access_key_id: string;
       secret_access_key: string;
@@ -39,6 +50,7 @@ declare module 'esdk-obs-nodejs' {
       MaxKeys?: number;
       Marker?: string;
     }): Promise<esdk.ListResult>;
+    headObject(params: { Bucket: string; Key: string }): Promise<esdk.HeadResult>;
     putObject(params: { Bucket: string; Key: string; SourceFile: string }): Promise<esdk.BaseResult>;
     getObject(params: { Bucket: string; Key: string; SaveAsFile: string }): Promise<esdk.BaseResult>;
     copyObject(params: { Bucket: string; Key: string; CopySource: string }): Promise<esdk.BaseResult>;

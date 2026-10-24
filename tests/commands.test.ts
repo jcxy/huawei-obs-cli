@@ -3,7 +3,6 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ObsClientLike, ObsObject } from '../src/obs.js';
-
 let workDir: string;
 beforeAll(() => {
   workDir = mkdtempSync(join(tmpdir(), 'obs-cli-cmd-'));
@@ -21,6 +20,10 @@ function fakeClient(objects: ObsObject[] = []): ObsClientLike & { calls: Record<
     listObjects: vi.fn(async (prefix: string) => {
       record('listObjects', [prefix]);
       return objects.filter((o) => o.key.startsWith(prefix));
+    }),
+    headObject: vi.fn(async (key: string) => {
+      record('headObject', [key]);
+      return { key, size: 1024, etag: 'abc123', lastModified: '2026-09-01T10:00:00.000Z' };
     }),
     putObject: vi.fn(async (key: string, filePath: string) => {
       record('putObject', [key, filePath]);
@@ -129,7 +132,11 @@ describe('upload', () => {
   it('uploads local file to key', async () => {
     const { runUpload } = await import('../src/commands/upload.js');
     const client = fakeClient();
-    const result = await runUpload(client, { file: join(workDir, '模版.xlsx'), key: 'dev/模版.xlsx' });
+    const result = await runUpload(client, {
+      file: join(workDir, '模版.xlsx'),
+      key: 'dev/模版.xlsx',
+      format: 'text',
+    });
     expect(result.ok).toBe(true);
     expect(client.calls.putObject).toEqual([['dev/模版.xlsx', join(workDir, '模版.xlsx')]]);
     expect(result.output).toContain('dev/模版.xlsx');
@@ -138,7 +145,7 @@ describe('upload', () => {
   it('fails when local file does not exist', async () => {
     const { runUpload } = await import('../src/commands/upload.js');
     const client = fakeClient();
-    const result = await runUpload(client, { file: 'no-such-file.bin', key: 'x.bin' });
+    const result = await runUpload(client, { file: 'no-such-file.bin', key: 'x.bin', format: 'text' });
     expect(result.ok).toBe(false);
     expect(client.calls.putObject).toBeUndefined();
     expect(result.output.toLowerCase()).toContain('no-such-file.bin');
@@ -149,7 +156,7 @@ describe('copy', () => {
   it('copies source key to dest key server-side', async () => {
     const { runCopy } = await import('../src/commands/copy.js');
     const client = fakeClient();
-    const result = await runCopy(client, { srcKey: 'dev/a.xlsx', destKey: 'prod/a.xlsx' });
+    const result = await runCopy(client, { srcKey: 'dev/a.xlsx', destKey: 'prod/a.xlsx', format: 'text' });
     expect(result.ok).toBe(true);
     expect(client.calls.copyObject).toEqual([['dev/a.xlsx', 'prod/a.xlsx']]);
     expect(result.output).toContain('dev/a.xlsx');
@@ -161,9 +168,117 @@ describe('rm', () => {
   it('deletes the object and reports it', async () => {
     const { runRm } = await import('../src/commands/rm.js');
     const client = fakeClient();
-    const result = await runRm(client, { key: 'dev/old.xlsx' });
+    const result = await runRm(client, { key: 'dev/old.xlsx', format: 'text' });
     expect(result.ok).toBe(true);
     expect(client.calls.deleteObject).toEqual([['dev/old.xlsx']]);
     expect(result.output).toContain('dev/old.xlsx');
+  });
+});
+
+describe('stat', () => {
+  it('prints key, size, etag and last-modified in text mode', async () => {
+    const { runStat } = await import('../src/commands/stat.js');
+    const client = fakeClient();
+    const result = await runStat(client, { key: 'dev/模版.xlsx', format: 'text' });
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('dev/模版.xlsx\t1024\tabc123\t2026-09-01T10:00:00.000Z');
+    expect(client.calls.headObject).toEqual([['dev/模版.xlsx']]);
+  });
+
+  it('outputs a single JSON object in json mode', async () => {
+    const { runStat } = await import('../src/commands/stat.js');
+    const client = fakeClient();
+    const result = await runStat(client, { key: 'a.xlsx', format: 'json' });
+    expect(result.ok).toBe(true);
+    expect(JSON.parse(result.output)).toEqual({
+      key: 'a.xlsx',
+      size: 1024,
+      etag: 'abc123',
+      lastModified: '2026-09-01T10:00:00.000Z',
+    });
+  });
+
+  it('reports a missing key as a plain message, so an agent can branch on it', async () => {
+    const { runStat } = await import('../src/commands/stat.js');
+    const { ObsError } = await import('../src/obs.js');
+    const client = fakeClient();
+    client.headObject = vi.fn(async () => {
+      throw new ObsError(404, 'NoSuchKey', 'The specified key does not exist.');
+    });
+    const result = await runStat(client, { key: 'missing.xlsx', format: 'text' });
+    expect(result.ok).toBe(false);
+    expect(result.output).toBe('No such object: missing.xlsx');
+  });
+
+  it('reports other OBS errors with status and code', async () => {
+    const { runStat } = await import('../src/commands/stat.js');
+    const { ObsError } = await import('../src/obs.js');
+    const client = fakeClient();
+    client.headObject = vi.fn(async () => {
+      throw new ObsError(403, 'AccessDenied', 'Access denied.');
+    });
+    const result = await runStat(client, { key: 'dev/a.xlsx', format: 'text' });
+    expect(result.ok).toBe(false);
+    expect(result.output).toContain('403');
+    expect(result.output).toContain('AccessDenied');
+  });
+});
+
+describe('--dry-run', () => {
+  it('describes an upload without calling the SDK', async () => {
+    const { runUpload } = await import('../src/commands/upload.js');
+    const client = fakeClient();
+    const file = join(workDir, '模版.xlsx');
+    const result = await runUpload(client, { file, key: 'dev/模版.xlsx', format: 'text', dryRun: true });
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe(`Would upload ${file} -> dev/模版.xlsx`);
+    expect(client.calls.putObject).toBeUndefined();
+  });
+
+  it('still validates the local file before reporting an upload', async () => {
+    const { runUpload } = await import('../src/commands/upload.js');
+    const client = fakeClient();
+    const result = await runUpload(client, {
+      file: 'no-such-file.bin',
+      key: 'x.bin',
+      format: 'text',
+      dryRun: true,
+    });
+    expect(result.ok).toBe(false);
+    expect(client.calls.putObject).toBeUndefined();
+  });
+
+  it('describes a delete in text mode', async () => {
+    const { runRm } = await import('../src/commands/rm.js');
+    const client = fakeClient();
+    const result = await runRm(client, { key: 'dev/old.xlsx', format: 'text', dryRun: true });
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('Would delete dev/old.xlsx');
+    expect(client.calls.deleteObject).toBeUndefined();
+  });
+
+  it('emits machine-readable JSON for copy and delete', async () => {
+    const { runCopy } = await import('../src/commands/copy.js');
+    const { runRm } = await import('../src/commands/rm.js');
+    const client = fakeClient();
+
+    const copy = await runCopy(client, {
+      srcKey: 'dev/a.xlsx',
+      destKey: 'prod/a.xlsx',
+      format: 'json',
+      dryRun: true,
+    });
+    expect(JSON.parse(copy.output)).toEqual({
+      dryRun: true,
+      action: 'copy',
+      source: 'dev/a.xlsx',
+      destination: 'prod/a.xlsx',
+    });
+
+    const rm = await runRm(client, { key: 'dev/a.xlsx', format: 'json', dryRun: true });
+    expect(JSON.parse(rm.output)).toEqual({ dryRun: true, action: 'delete', key: 'dev/a.xlsx' });
+
+    expect(client.calls.copyObject).toBeUndefined();
+    expect(client.calls.deleteObject).toBeUndefined();
   });
 });
