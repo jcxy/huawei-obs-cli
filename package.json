@@ -26,6 +26,13 @@
     "verify:skill": "node scripts/verify-skill.mjs",
     "prepublishOnly": "npm run build && npm test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcxy/huawei-obs-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jcxy/huawei-obs-cli/issues"
+  },
   "keywords": [
     "huawei",
     "obs",
